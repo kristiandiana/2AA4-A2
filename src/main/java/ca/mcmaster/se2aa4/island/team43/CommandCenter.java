@@ -50,13 +50,13 @@ public class CommandCenter {
 
     }
 
-    public String deliverFinalReport() {
+    public String determineFinalReport() {
 
         // SEND THE FINAL REPORT TO THE EXPLORER
 
         // NOTE SURE WHAT DATA TO SEND YET... TBD
 
-        return "no creek found";
+        return "Mission Complete: message from CommandCenter to Explorer"; 
 
     }
 

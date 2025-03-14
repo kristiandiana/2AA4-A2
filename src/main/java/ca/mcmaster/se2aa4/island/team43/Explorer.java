@@ -41,7 +41,9 @@ public class Explorer implements IExplorerRaid {
 
     @Override
     public String deliverFinalReport() {
-        return "no creek found";
+        
+        String finalReport = commandCenter.determineFinalReport();
+        return finalReport; // get the final report from CommandCenter
     }
 
 }
