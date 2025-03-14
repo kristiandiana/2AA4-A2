@@ -5,6 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import eu.ace_design.island.bot.IExplorerRaid;
+import scala.annotation.meta.param;
+
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -26,7 +28,8 @@ public class Explorer implements IExplorerRaid {
     @Override
     public String takeDecision() {
         JSONObject decision = new JSONObject();
-        decision.put("action", "stop"); // we stop the exploration immediately
+        decision.put("action", "echo"); // we stop the exploration immediately
+        decision.put("parameters", new JSONObject().put("direction", "S"));
         logger.info("** Decision: {}",decision.toString());
         return decision.toString();
     }
