@@ -10,9 +10,20 @@ import org.json.JSONTokener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import ca.mcmaster.se2aa4.island.team43.CommandCenter;
+
 public class JSONHandler {
 
     private final Logger logger = LogManager.getLogger();
+    private final CommandCenter commandCenter;
+
+    public JSONHandler(CommandCenter commandCenter) {
+        this.commandCenter = commandCenter;
+    }
+
+    public JSONHandler() {
+        this.commandCenter = null;
+    }
 
     // Write into JSON file
     public String createDecision(String action, Map<String, String> parameters) {
@@ -36,13 +47,17 @@ public class JSONHandler {
         // SEND ALL THE FOLLOWING TO THE COMMANDCENTER TO GBE PROCESSED
 
         int cost = response.getInt("cost");
-        logger.info("The cost of the action was {}", cost); // GIVE TO DRONE POWER MANAGEMENT
+        //logger.info("The cost of the action was {}", cost); // GIVE TO DRONE POWER MANAGEMENT
         
         String status = response.getString("status");
-        logger.info("The status of the drone is {}", status); // GIVE TO MIA CHECK
+        //logger.info("The status of the drone is {}", status); // GIVE TO MIA CHECK
         
         JSONObject extraInfo = response.getJSONObject("extras");
-        logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
+        //logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
+
+
+        commandCenter.processData(cost, status, extraInfo);
+
     }
 
 }

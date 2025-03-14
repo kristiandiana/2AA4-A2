@@ -9,12 +9,13 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import ca.mcmaster.se2aa4.island.team43.JSONHandler;
+import ca.mcmaster.se2aa4.island.team43.CommandCenter;
 
 public class Explorer implements IExplorerRaid {
 
     private final Logger logger = LogManager.getLogger();
-
-    private final JSONHandler jsonHandler = new JSONHandler();
+    private final CommandCenter commandCenter = new CommandCenter();
+    private final JSONHandler jsonHandler = new JSONHandler(commandCenter);
 
     @Override
     public void initialize(String s) {
@@ -30,12 +31,12 @@ public class Explorer implements IExplorerRaid {
     @Override
     public String takeDecision() {
 
-        return jsonHandler.createDecision("stop", null);
+        return commandCenter.getCommand(); // returns formatting JSON string -> done by JSONHandler
     }
 
     @Override
     public void acknowledgeResults(String s) {
-        jsonHandler.processResponse(s);
+        jsonHandler.processResponse(s); // retrieves information from JSON string s -> sends to CommandCenter
     }
 
     @Override
