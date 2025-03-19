@@ -17,6 +17,10 @@ public class Drone {
         return currentCoordinate;
     }
 
+    public Location getBaseCoordinate(){
+        return startCoordinate;
+    }
+
     public Orientation getCurrentOrientation(){
         return currentOrientation;
     }
@@ -28,16 +32,16 @@ public class Drone {
     public void fly(){
         switch(currentOrientation){
             case NORTH:
-                currentCoordinate = new Location(currentCoordinate.getX(), currentCoordinate.getY() - 1);
+                currentCoordinate = new NormalLocation(currentCoordinate.getX(), currentCoordinate.getY() - 1);
                 break;
             case EAST:
-                currentCoordinate = new Location(currentCoordinate.getX() + 1, currentCoordinate.getY());
+                currentCoordinate = new NormalLocation(currentCoordinate.getX() + 1, currentCoordinate.getY());
                 break;
             case SOUTH:
-                currentCoordinate = new Location(currentCoordinate.getX(), currentCoordinate.getY() + 1);
+                currentCoordinate = new NormalLocation(currentCoordinate.getX(), currentCoordinate.getY() + 1);
                 break;
             case WEST:
-                currentCoordinate = new Location(currentCoordinate.getX() - 1, currentCoordinate.getY());
+                currentCoordinate = new NormalLocation(currentCoordinate.getX() - 1, currentCoordinate.getY());
                 break;
         }
     }

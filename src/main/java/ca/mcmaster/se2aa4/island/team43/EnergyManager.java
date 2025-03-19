@@ -12,8 +12,8 @@ public class EnergyManager {
 
     public boolean checkBattery(){
         //Calculate current battery, and whats needed to return to base
-        int distanceToBase = (drone.getCurrentCoordinate().getX() - drone.startCoordinate.getX()) + (drone.getCurrentCoordinate().getY() - drone.startCoordinate.getY());
-        return currentBattery > distanceToBase * 6;
+        int distanceToBase = (drone.getCurrentCoordinate().getX() - drone.getBaseCoordinate().getX()) + (drone.getCurrentCoordinate().getY() - drone.getBaseCoordinate().getY());
+        return currentBattery > distanceToBase * 6 * 6;
     }
 
     public int getCurrentBattery(){
