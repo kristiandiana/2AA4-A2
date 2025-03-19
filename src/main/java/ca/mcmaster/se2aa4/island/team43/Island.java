@@ -18,13 +18,28 @@ public class Island {
         this.emergencySite = null;
     }
 
-    public void addCreek(int x, int y) {
+    public void addLocation(String type, int x, int y) {
+        if (type.equals("creek")) {
+            addCreek(x, y);
+        } else if (type.equals("emergency")) {
+            addEmergencySite(x, y);
+        } else {
+            addLocation(x, y);
+        }
+    }
+
+    private void addLocation(int x, int y) {
+        NormalLocation newLocation = new NormalLocation(x, y);
+        this.grid[x][y] = newLocation;
+    }
+
+    private void addCreek(int x, int y) {
         Creek newCreek = new Creek(x, y);
         this.creeks.add(newCreek);
         this.grid[x][y] = newCreek;
     }
 
-    public void addEmergencySite(int x, int y) {
+    private void addEmergencySite(int x, int y) {
         if (this.emergencySite != null) {
             throw new Error("Cannot have more than one Pick Up Location!");
         }
