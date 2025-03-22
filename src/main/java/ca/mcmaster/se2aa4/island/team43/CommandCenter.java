@@ -17,18 +17,53 @@ public class CommandCenter {
     //Taking decisions at each step of drone flight
     private final JSONHandler jsonHandler = new JSONHandler();
     private final Logger logger = LogManager.getLogger();
+    Drone drone;
+    SearchAlgorithm searchAlgorithm;
+    private int phase;
+
+    public CommandCenter() {
+
+        // this.drone = new Drone();
+        this.searchAlgorithm = new SearchAlgorithm();
+        this.phase = 0;
+
+        // SHOULD ENERGY MANAGER BE INSTANTIATED HERE?
+        // EnergyManager energyManager = new EnergyManager(drone, 1000);
+    }
     
     public String getCommand() {
         // SOME LOGIC, IMPLEMENTED ELSEWHERE, IS USED TO DETERMINE THE ACTION AND PARAMETERS
     
-        String action;
+        String action = new String();
         Map<String, String> parameters = new HashMap<String, String>();
 
         // EXAMPLE DATA FOR NOW BUT PUT THE LOGIC / ALGORITHM HERE
-        action = "echo";
-        parameters.put("direction", "N");
-        // action = "stop"; // other test case
-        // parameters = null;
+        if (phase == 0) {
+            action = this.searchAlgorithm.findDimensions(parameters);
+            if (action.equals("COMPLETED PHASE 1")) {
+                phase = 1; // move to the next phase
+
+                // *** IMPORTANT ***
+                // MIGHT BE GOOD TO INITIALIZE THE ISLAND HERE AS MAX WIDTH AND HEIGHT ARE NOW KNOWN IN THE SEARCH ALGORITHM OBJECT
+
+            }
+        } 
+        if (phase == 1) {
+            action = this.searchAlgorithm.goToCenter(parameters);
+            if (action.equals("COMPLETED PHASE 2")) {
+                phase = 2; // move to the next phase
+            }
+        }
+        if (phase == 2) {
+            action = this.searchAlgorithm.spiralSearch(parameters);
+            if (action.equals("COMPLETED PHASE 3")) {
+                phase = 3; // move to the next phase
+            }
+        }
+        if (phase == 3){
+            action = "stop";
+            parameters = null;
+        }
 
         // SEND THE ACTION AND PARAMETERS TO THE Explorer
         return jsonHandler.createDecision(action, parameters);
@@ -47,6 +82,20 @@ public class CommandCenter {
         logger.info("The cost of the action was {}", cost); // GIVE TO DRONE POWER MANAGEMENT
         logger.info("The status of the drone is {}", status); // GIVE TO MIA CHECK  
         logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
+
+        if (phase == 0) { // getting width and height 
+            if (searchAlgorithm.getCounter() == 1){ // get the width from the extraInfo
+                int width = extraInfo.getInt("range");
+                // logger.info("The width of the island is {}", width);
+                searchAlgorithm.setMapWidth(width);
+            }
+            else if (searchAlgorithm.getCounter() == 2){ // get the height from the extraInfo
+                int height = extraInfo.getInt("range");
+                // logger.info("The height of the island is {}", height);
+                searchAlgorithm.setMapHeight(height);
+            }
+        }
+
 
     }
 
