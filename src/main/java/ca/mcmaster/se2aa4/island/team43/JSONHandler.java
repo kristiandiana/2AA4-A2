@@ -15,7 +15,7 @@ import ca.mcmaster.se2aa4.island.team43.CommandCenter;
 public class JSONHandler {
 
     private final Logger logger = LogManager.getLogger();
-    private final CommandCenter commandCenter;
+    private CommandCenter commandCenter;
 
     public JSONHandler(CommandCenter commandCenter) {
         this.commandCenter = commandCenter;
@@ -55,7 +55,7 @@ public class JSONHandler {
         JSONObject extraInfo = response.getJSONObject("extras");
         //logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
 
-
+        logger.info("Processing data...");
         commandCenter.processData(cost, status, extraInfo);
 
     }

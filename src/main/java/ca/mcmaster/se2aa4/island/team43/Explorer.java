@@ -14,8 +14,8 @@ import ca.mcmaster.se2aa4.island.team43.CommandCenter;
 public class Explorer implements IExplorerRaid {
 
     private final Logger logger = LogManager.getLogger();
-    private final CommandCenter commandCenter = new CommandCenter();
-    private final JSONHandler jsonHandler = new JSONHandler(commandCenter);
+    private CommandCenter commandCenter;
+    private JSONHandler jsonHandler;
 
     @Override
     public void initialize(String s) {
@@ -23,9 +23,11 @@ public class Explorer implements IExplorerRaid {
         JSONObject info = new JSONObject(new JSONTokener(new StringReader(s)));
         logger.info("** Initialization info:\n {}",info.toString(2));
         String direction = info.getString("heading");
-        Integer batteryLevel = info.getInt("budget");
+        int batteryLevel = info.getInt("budget");
         logger.info("The drone is facing {}", direction);
         logger.info("Battery level is {}", batteryLevel);
+        this.commandCenter = new CommandCenter(batteryLevel, direction);
+        this.jsonHandler = new JSONHandler(commandCenter);
     }
 
     @Override

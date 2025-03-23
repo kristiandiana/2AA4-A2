@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.io.StringReader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.json.JSONArray;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,10 +22,10 @@ public class CommandCenter {
     SearchAlgorithm searchAlgorithm;
     private int phase;
 
-    public CommandCenter() {
+    public CommandCenter(int startBattery, String startOrientation) {
 
-        // this.drone = new Drone();
-        this.searchAlgorithm = new SearchAlgorithm();
+        this.drone = new Drone(startBattery, startOrientation);
+        this.searchAlgorithm = new SearchAlgorithm(this.drone);
         this.phase = 0;
 
         // SHOULD ENERGY MANAGER BE INSTANTIATED HERE?
@@ -71,7 +72,7 @@ public class CommandCenter {
     }
 
     public void processData (int cost, String status, JSONObject extraInfo) {
-
+        logger.info("Processing data... command center side");
         /*
             PARAMETERS ARE COMING STRAIGHT FROM THE JSONHANDLER:
             - COST shoud be given to the drone power management
@@ -84,6 +85,7 @@ public class CommandCenter {
         logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
 
         if (phase == 0) { // getting width and height 
+            /*
             if (searchAlgorithm.getCounter() == 1){ // get the width from the extraInfo
                 int width = extraInfo.getInt("range");
                 // logger.info("The width of the island is {}", width);
@@ -94,9 +96,20 @@ public class CommandCenter {
                 // logger.info("The height of the island is {}", height);
                 searchAlgorithm.setMapHeight(height);
             }
+            */
+           logger.info("Got here");
         }
+        else if (phase == 2) {
+            JSONArray sites = extraInfo.getJSONArray("sites");
+            if (sites.length() > 0) {
+                searchAlgorithm.setFoundEmergencySite(true);
 
+                // *** IMPORTANT ***
+                // NEED TO STORE THE EMERGENCY SITE LOCATION AND ID
 
+                // logger.info("Emergency site found: {}", sites);
+            }
+        }
     }
 
     public String determineFinalReport() {
