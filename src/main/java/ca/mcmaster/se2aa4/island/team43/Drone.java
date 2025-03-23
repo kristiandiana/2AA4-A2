@@ -11,6 +11,7 @@ public class Drone {
     private Orientation currentOrientation;
     private final EnergyManager energyManager;
     private final Location startCoordinate;
+
     private final Logger logger = LogManager.getLogger();
 
     public Drone(int maxBattery, String startOrientation){
@@ -37,7 +38,7 @@ public class Drone {
         }
         return null;
     }
-
+  
     public Location getCurrentCoordinate(){
         return currentCoordinate;
     }
@@ -157,7 +158,6 @@ public class Drone {
         }
         return action;
     }
-
 
     public void fly(){
         switch(currentOrientation){
