@@ -19,13 +19,38 @@ public class SearchAlgorithm {
     private final Logger logger = LogManager.getLogger();
     private int mapWidth;
     private int mapHeight;
+    private boolean foundEmergencySite;
+    private Drone drone;
 
-    public SearchAlgorithm() {
+    public SearchAlgorithm(Drone drone) {
         this.counter = 0;
+        this.foundEmergencySite = false;
+        this.drone = drone;
     }
 
     public String findDimensions (Map<String, String> parameters) {
+
         String action;
+
+        if (counter == 150){
+            action = "stop";
+        }
+
+        else if (counter % 2 == 0){
+            action = "scan";
+        }
+        else if (counter < 50){
+            action = drone.fly("E", parameters);
+        }
+        else if (counter >= 50 && counter < 100){
+            logger.info("I AM THE PROBLEM");
+            //action = "stop";
+            action = drone.fly("S", parameters);
+        }
+        else {
+            action = drone.fly("W", parameters);
+        }
+        /*
         if (counter == 0){
             action = "echo";
             parameters.put("direction", "E");
@@ -38,6 +63,7 @@ public class SearchAlgorithm {
             action = "COMPLETED PHASE 1";
             counter = -1; // reset counter
         }
+        */
         counter += 1;
         return action;
     }
@@ -65,10 +91,9 @@ public class SearchAlgorithm {
 
     public String spiralSearch(Map<String, String> parameters) {
         // fixed logic for now, but will be replaced with actual search algorithm
-        if (counter == 2) {
+        if (this.foundEmergencySite == true) {
             return "COMPLETED PHASE 3";
         }
-
 
         
         String action;
@@ -98,6 +123,10 @@ public class SearchAlgorithm {
 
     public int getMapHeight(){
         return this.mapHeight;
+    }
+
+    public void setFoundEmergencySite(boolean foundEmergencySite){
+        this.foundEmergencySite = foundEmergencySite;
     }
 
 }
