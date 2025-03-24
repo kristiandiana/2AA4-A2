@@ -1,5 +1,8 @@
-package ca.mcmaster.se2aa4.island.team43;
+package ca.mcmaster.se2aa4.island.team43.HomeBase;
 
+
+
+import java.io.BufferedReader;
 import java.io.StringReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,8 +11,9 @@ import eu.ace_design.island.bot.IExplorerRaid;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import ca.mcmaster.se2aa4.island.team43.JSONHandler;
-import ca.mcmaster.se2aa4.island.team43.CommandCenter;
+import ca.mcmaster.se2aa4.island.team43.Drone.*;
+import ca.mcmaster.se2aa4.island.team43.HomeBase.*;
+
 
 public class Explorer implements IExplorerRaid {
 

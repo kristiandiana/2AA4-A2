@@ -1,4 +1,10 @@
-package ca.mcmaster.se2aa4.island.team43;
+package ca.mcmaster.se2aa4.island.team43.Map;
+
+import ca.mcmaster.se2aa4.island.team43.Map.Location;
+import ca.mcmaster.se2aa4.island.team43.Map.POI;
+
+
+
 
 public class EmergencySite extends Location implements POI  {
     //A POI of pickup spots for rescuers

@@ -1,4 +1,7 @@
-package ca.mcmaster.se2aa4.island.team43;
+package ca.mcmaster.se2aa4.island.team43.Drone;
+
+import ca.mcmaster.se2aa4.island.team43.Drone.Drone;
+
 
 public class EnergyManager {
     private int currentBattery;
