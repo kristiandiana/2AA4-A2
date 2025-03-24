@@ -43,7 +43,7 @@ public class CommandCenter {
             action = this.searchAlgorithm.findDimensions(parameters);
             if (action.equals("COMPLETED PHASE 1")) {
                 phase = 1; // move to the next phase
-
+                logger.info("Completed phase 1");
                 // *** IMPORTANT ***
                 // MIGHT BE GOOD TO INITIALIZE THE ISLAND HERE AS MAX WIDTH AND HEIGHT ARE NOW KNOWN IN THE SEARCH ALGORITHM OBJECT
 
@@ -87,16 +87,7 @@ public class CommandCenter {
         logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
 
         if (phase == 0) { // getting width and height 
-            if (searchAlgorithm.getCounter() == 1){ // get the width from the extraInfo
-                int width = extraInfo.getInt("range");
-                // logger.info("The width of the island is {}", width);
-                searchAlgorithm.setMapWidth(width);
-            }
-            else if (searchAlgorithm.getCounter() == 2){ // get the height from the extraInfo
-                int height = extraInfo.getInt("range");
-                // logger.info("The height of the island is {}", height);
-                searchAlgorithm.setMapHeight(height);
-            }
+            searchAlgorithm.validateBounds(extraInfo);
         }
         else if (phase == 2) {
             JSONArray sites = extraInfo.getJSONArray("sites");

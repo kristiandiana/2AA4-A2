@@ -43,6 +43,11 @@ public class Drone {
         return currentCoordinate;
     }
 
+    public void setCurrentCoordinate(int x, int y){
+        Location newCoordinate = new NormalLocation(x, y);
+        this.currentCoordinate = newCoordinate;
+    }
+
     public Location getBaseCoordinate(){
         return startCoordinate;
     }
