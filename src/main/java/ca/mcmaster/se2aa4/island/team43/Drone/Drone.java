@@ -3,6 +3,7 @@ package ca.mcmaster.se2aa4.island.team43.Drone;
 import ca.mcmaster.se2aa4.island.team43.Drone.*;
 import ca.mcmaster.se2aa4.island.team43.HomeBase.*;
 import ca.mcmaster.se2aa4.island.team43.Map.*;
+import ca.mcmaster.se2aa4.island.team43.Phases.*;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class Drone {
         this.startCoordinate = new NormalLocation(1, 1);
         this.currentCoordinate = new NormalLocation(1, 1);
         this.currentOrientation = stringToOrientation(startOrientation);
-        this.energyManager = new EnergyManager(this, maxBattery);
+        this.energyManager = new EnergyManager(maxBattery);
     }
 
     public Orientation stringToOrientation(String orientation){
@@ -189,7 +190,7 @@ public class Drone {
         energyManager.depleteBattery(cost);
     }
 
-    public boolean checkBattery(){
+    public Phase checkBattery(){
         return energyManager.checkBattery();
     }
 

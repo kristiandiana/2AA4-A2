@@ -1,22 +1,22 @@
 package ca.mcmaster.se2aa4.island.team43.Drone;
 
-import ca.mcmaster.se2aa4.island.team43.Drone.Drone;
-
+import ca.mcmaster.se2aa4.island.team43.Phases.Phase;
 
 public class EnergyManager {
     private int currentBattery;
-    private final Drone drone;
+    private final int distanceToBase = 30;
 
     //Managing battery levels
-    public EnergyManager(Drone drone, int maxBattery){
+    public EnergyManager(int maxBattery){
         this.currentBattery = maxBattery;
-        this.drone = drone;
     }
 
-    public boolean checkBattery(){
+    public Phase checkBattery(){
         //Calculate current battery, and whats needed to return to base
-        int distanceToBase = (drone.getCurrentCoordinate().getX() - drone.getBaseCoordinate().getX()) + (drone.getCurrentCoordinate().getY() - drone.getBaseCoordinate().getY());
-        return currentBattery > distanceToBase * 6 * 6;
+        if(currentBattery <= 30){
+            return Phase.STOP;
+        }
+        return Phase.CONTINUE;
     }
 
     public int getCurrentBattery(){
