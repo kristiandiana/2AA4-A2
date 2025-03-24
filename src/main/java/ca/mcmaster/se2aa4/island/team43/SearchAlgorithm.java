@@ -27,7 +27,6 @@ public class SearchAlgorithm {
     private int islandBottom;
     private int islandLeft;
     private int islandRight;
-    private boolean onSecondSweep;
 
 
     public SearchAlgorithm(Drone drone) {
@@ -36,15 +35,15 @@ public class SearchAlgorithm {
         this.drone = drone;
         this.isWidthCentered = false;
         this.isHeightCentered = false;
-        this.onSecondSweep = false;
     }
 
-    /* SEARCH ALGORITHM HAS 5 PHASES
+    /* SEARCH ALGORITHM HAS 7 PHASES
      * FIND DIMENSIONS
      * GO TO CENTRE
      * GO TO TOP LEFT
      * GET ISLAND DIMENSIONS
      * FIRST SWEEP (interlaced sweep requires two iterations)
+     * IF LENGTH OF ISLAND IS EVEN, THEN: U TURN PHASE AND COMPLETE LAST ROW
      * SECOND SWEEP
      */
 
@@ -193,11 +192,29 @@ public class SearchAlgorithm {
     //this function conducts the sweep after the dimensions are found
     public String firstSweep (Map<String, String> parameters) {
         String action;
-
-        //currently incomplete, need to account for the end condition later
+        boolean stop = false;
         
         Orientation direct = drone.getCurrentOrientation();
         Location currLoc = drone.getCurrentCoordinate();
+
+        if (((this.islandBottom - this.islandTop) % 4 == 0) && (currLoc.getY() == this.islandTop - 1) && (currLoc.getX() == this.islandRight)) {
+            stop = true;
+        } else if (((this.islandBottom - this.islandTop) % 2 == 0) && (currLoc.getY() == this.islandTop - 1) && (currLoc.getX() == this.islandLeft)) {
+            stop = true;
+        } else if ((currLoc.getY() == this.islandTop)) {
+
+            if (((this.islandBottom - this.islandTop - 1) % 4 == 0) && (currLoc.getX() == this.islandLeft)) {
+                stop = true;
+            } else if (currLoc.getX() == this.islandRight) {
+                stop = true;
+            }
+            
+        }
+
+        if (stop){
+            return "COMPLETED PHASE 5";
+        }
+
         if (direct == Orientation.NORTH) {
             if (currLoc.getX() == this.islandRight + 1) {
                 action = drone.fly("E", parameters);
@@ -251,6 +268,10 @@ public class SearchAlgorithm {
 
     public void setFoundEmergencySite(boolean foundEmergencySite){
         this.foundEmergencySite = foundEmergencySite;
+    }
+
+    public int getIslandHeight(){
+        return (this.islandBottom - this.islandTop);
     }
 
 }
