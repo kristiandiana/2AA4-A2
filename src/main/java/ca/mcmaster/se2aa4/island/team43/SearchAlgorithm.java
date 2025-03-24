@@ -94,6 +94,7 @@ public class SearchAlgorithm {
 
     public String spiralSearch(Map<String, String> parameters) {
         // fixed logic for now, but will be replaced with actual search algorithm
+        /*
         if (this.foundEmergencySite == true) {
             return "COMPLETED PHASE 3";
         }
@@ -106,7 +107,36 @@ public class SearchAlgorithm {
         logger.info("Counter: {}", this.counter);
 
         return action;
+        */
 
+        /*pseudo code for search
+        PHASE 3.1: SIZE OF ISLAND
+
+        go all the way north until water is found
+        then continue north until scan throws out of bound on both left and right,
+        mark this as the top
+        turn left, and continue going all the way left until left echo is not returned keep this as the left 
+        turn left again, and go until you're past the middle, then start scanning and keep going in similar fashion
+        when no more scan is found, then you've reached the end. and we know max width and max height of island
+
+        PHASE 3.2 FIRST SWEEP
+
+        at this point, you are at the bottom left corner
+        turn twice, and you'll be within the bounds of the map. for now, for every cell in there, scan the bottom
+        when you reach the end of a row, turn left or right (depending on current heading) 2x to make a u turn
+        |-> after this always move forward once before going again.
+        stop this loop when you've reached either the end if the length of the island is odd, or the second last if even
+        if even, do three turns to do the last row that wouldve been missed
+
+        PHASE 3.4 SECOND SWEEP
+
+        then if even, immediately continue in the same fashion, propogating down instead
+        if odd, then do the three tunrs to do a u turn.
+
+
+        Additionally battery life should be watched, and as soon as the battery will die, the return home should be called
+
+        */
     }
 
     public int getCounter(){
