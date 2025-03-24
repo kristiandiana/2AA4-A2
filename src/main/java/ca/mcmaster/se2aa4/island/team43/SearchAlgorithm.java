@@ -107,69 +107,51 @@ public class SearchAlgorithm {
         counter += 1;
         return action;
     }
+    /*
+    pseudo code for search
+    SIZE OF ISLAND
 
-    public String spiralSearch(Map<String, String> parameters) {
-        // fixed logic for now, but will be replaced with actual search algorithm
-        /*
-        if (this.foundEmergencySite == true) {
-            return "COMPLETED PHASE 3";
-        }
+    go all the way north until water is found
+    then continue north until scan throws out of bound on both left and right,
+    mark this as the top
+    turn left, and continue going all the way left until left echo is not returned keep this as the left 
+    turn left again, and go until you're past the middle, then start scanning and keep going in similar fashion
+    when no more scan is found, then you've reached the end. and we know max width and max height of island
 
-        
-        String action;
-        action = "scan";
+    FIRST SWEEP
 
-        this.counter += 1;
-        logger.info("Counter: {}", this.counter);
+    at this point, you are at the bottom left corner
+    turn twice, and you'll be within the bounds of the map. for now, for every cell in there, scan the bottom
+    when you reach the end of a row, turn left or right (depending on current heading) 2x to make a u turn
+    |-> after this always move forward once before going again.
+    stop this loop when you've reached either the end if the length of the island is odd, or the second last if even
+    if even, do three turns to do the last row that wouldve been missed
 
-        return action;
-        */
+    SECOND SWEEP
 
-        /*
-        pseudo code for search
-        PHASE 3.1: SIZE OF ISLAND
-
-        go all the way north until water is found
-        then continue north until scan throws out of bound on both left and right,
-        mark this as the top
-        turn left, and continue going all the way left until left echo is not returned keep this as the left 
-        turn left again, and go until you're past the middle, then start scanning and keep going in similar fashion
-        when no more scan is found, then you've reached the end. and we know max width and max height of island
-
-        PHASE 3.2 FIRST SWEEP
-
-        at this point, you are at the bottom left corner
-        turn twice, and you'll be within the bounds of the map. for now, for every cell in there, scan the bottom
-        when you reach the end of a row, turn left or right (depending on current heading) 2x to make a u turn
-        |-> after this always move forward once before going again.
-        stop this loop when you've reached either the end if the length of the island is odd, or the second last if even
-        if even, do three turns to do the last row that wouldve been missed
-
-        PHASE 3.4 SECOND SWEEP
-
-        then if even, immediately continue in the same fashion, propogating down instead
-        if odd, then do the three tunrs to do a u turn.
+    then if even, immediately continue in the same fashion, propogating down instead
+    if odd, then do the three tunrs to do a u turn.
 
 
-        Additionally battery life should be watched, and as soon as the battery will die, the return home should be called
-        */
-
-    }
+    Additionally battery life should be watched, and as soon as the battery will die, the return home should be called
+    */
 
     //takes in parameter output map, and previous echo response as arguments, returns the action as the output
     // if out of bounds is found both left and right when the droen is facing north, then echoRes should == "none"
     // similar for when drone facign east, except only left
-    public String goToTopLeft(Map<String, String> parameters, String echoRes) {
+    public String goToTopLeft(Map<String, String> parameters) { return goToTopLeft(parameters, true)}
+    public String goToTopLeft(Map<String, String> parameters, boolean echoRes) {
         String action;
         if (drone.getCurrentOrientation() == Orientation.NORTH){
-            if (echoRes == "none"){
-                this.islandTop = drone.getCurrentCoordinate().getY();
+            if (!echoRes){
+                this.islandTop = drone.getCurrentCoordinate().getY() + 1;
                 action = drone.fly("W", parameters);
             } else {
                 action = drone.fly("N", parameters);
             }
         } else if (drone.getCurrentOrientation() == Orientation.WEST) {
-            if (echoRes == "none"){
+            if (!echoRes){
+                this.islandLeft = drone.getCurrentCoordinate().getX() + 1;
                 action = drone.fly("S", parameters);
             } else {
                 action = drone.fly("W", parameters);
@@ -182,14 +164,67 @@ public class SearchAlgorithm {
     }
 
     //this function essentially goes from top left to bottom right to find dimensions of the island
-    public String getIslandDimension (Map<String, String> parameters, String echoRes) {
+    //similar to (when facing west) above, echoRes should only be the result from the appropriate echo
+    public String getIslandDimension (Map<String, String> parameters) { return getIslandDimension(parameters, true); }
+    public String getIslandDimension (Map<String, String> parameters, boolean echoRes) {
         String action;
+
+        if (drone.getCurrentOrientation() == Orientation.SOUTH) {
+            //this should be optimized later: tell command not to echo if we havent reached middle yet
+            if (!echoRes) {
+                this.islandBottom = drone.getCurrentCoordinate().getY() - 1;
+                action = drone.fly("E", parameters);
+            } else {
+                action = drone.fly("S", parameters);
+            }
+        } else if (drone.getCurrentOrientation() == Orientation.EAST) {
+            if (!echoRes) {
+                this.islandRight = drone.getCurrentCoordinate().getX() - 1;
+                action = drone.fly("N", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else {
+            action = "COMPLETED PHASE 4";
+        }
         return action;
     }
 
     //this function conducts the sweep after the dimensions are found
-    public String sweepSearch (Map<String, String> parameters) {
+    public String firstSweep (Map<String, String> parameters) {
         String action;
+
+        //currently incomplete, need to account for the end condition later
+        
+        Orientation direct = drone.getCurrentOrientation();
+        Location currLoc = drone.getCurrentCoordinate();
+        if (direct == Orientation.NORTH) {
+            if (currLoc.getX() == this.islandRight + 1) {
+                action = drone.fly("E", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        } else if (direct == Orientation.EAST) {
+            if (currLoc.getX() == this.islandRight) {
+                action = drone.fly("N", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else if (direct == Orientation.WEST) {
+            if (currLoc.getX() == this.islandLeft) {
+                action = drone.fly("N", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        } else {
+            if (currLoc.getX() < this.islandLeft) {
+                action = drone.fly("E", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        }
+        
+        
         return action;
     }
 
