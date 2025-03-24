@@ -262,12 +262,54 @@ public class SearchAlgorithm {
         } else if (this.getIslandHeight() % 4 == 0) {
             String [] moves = {"E", "E", "N", "N", "W", "S", "W"};
             action = drone.fly(moves[this.counter], parameters);
-        } else if (this.getIslandHeight() % 2 == 0) {
+        } else {
             String [] moves = {"W", "W", "N", "N", "E", "S", "E"};
-            action = drone.fly(moves[this.counter], parameters)
+            action = drone.fly(moves[this.counter], parameters);
         }
 
         this.counter++;
+        return action;
+    }
+
+    public String secondSweep(Map<String, String> parameters){
+        String action;
+        boolean stop = false;
+
+        Orientation direct = drone.getCurrentOrientation();
+        Location currLoc = drone.getCurrentCoordinate();
+
+        if (currLoc.getY() == this.islandBottom + 1) {
+            if ((direct == Orientation.EAST) && (currLoc.getX() == this.islandLeft)){
+                stop = true;
+            } else if ((direct == Orientation.WEST) && (currLoc.getX() == this.islandRight)){
+                stop = true;
+            }
+        }
+
+        if (stop){
+            return "COMPLETED PHASE 7 AND COMPLETE SEARCH";
+        }
+
+        if (direct == Orientation.SOUTH) {
+            if (currLoc.getX() == this.islandRight + 1) {
+                action = drone.fly("W", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else if (direct == Orientation.EAST) {
+            if (currLoc.getX() == this.islandRight) {
+                action = drone.fly("S", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else {
+            if (currLoc.getX() == this.islandLeft) {
+                action = drone.fly("S", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        }
+        
         return action;
     }
 
