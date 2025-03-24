@@ -50,11 +50,11 @@ public class SearchAlgorithm {
     public String findDimensions (Map<String, String> parameters) {
 
         String action;
-        if (counter == 0){
+        if (this.counter == 0){
             action = "echo";
             parameters.put("direction", "E");
         }
-        else if (counter == 1){
+        else if (this.counter == 1){
             action = "echo";
             parameters.put("direction", "S");
         }
@@ -63,7 +63,7 @@ public class SearchAlgorithm {
             counter = -1; // reset counter
         }
 
-        counter += 1;
+        this.counter += 1;
         return action;
     }
 
@@ -100,10 +100,10 @@ public class SearchAlgorithm {
         }
         else {
             action = "COMPLETED PHASE 2";
-            counter = -1; // reset counter
+            this.counter = -1; // reset counter
         }
 
-        counter += 1;
+        this.counter += 1;
         return action;
     }
     /*
@@ -138,7 +138,7 @@ public class SearchAlgorithm {
     //takes in parameter output map, and previous echo response as arguments, returns the action as the output
     // if out of bounds is found both left and right when the droen is facing north, then echoRes should == "none"
     // similar for when drone facign east, except only left
-    public String goToTopLeft(Map<String, String> parameters) { return goToTopLeft(parameters, true)}
+    public String goToTopLeft(Map<String, String> parameters) { return goToTopLeft(parameters, true); }
     public String goToTopLeft(Map<String, String> parameters, boolean echoRes) {
         String action;
         if (drone.getCurrentOrientation() == Orientation.NORTH){
@@ -193,7 +193,7 @@ public class SearchAlgorithm {
     public String firstSweep (Map<String, String> parameters) {
         String action;
         boolean stop = false;
-        
+
         Orientation direct = drone.getCurrentOrientation();
         Location currLoc = drone.getCurrentCoordinate();
 
@@ -212,6 +212,7 @@ public class SearchAlgorithm {
         }
 
         if (stop){
+            this.counter = 0;
             return "COMPLETED PHASE 5";
         }
 
@@ -241,7 +242,32 @@ public class SearchAlgorithm {
             }
         }
         
-        
+        return action;
+    }
+
+    public String uTurn(Map<String, String> parameters) {
+        String action;
+
+        Location currLoc = drone.getCurrentCoordinate();
+
+        if (this.counter == 7) {
+            counter = - 1;
+            action = "COMPLETED PHASE 6";
+        } else if ((this.getIslandHeight() - 1) % 4 == 0) {
+            String [] moves = {"N", "W", "S", "S", "E", "E", "E"};
+            action = drone.fly(moves[this.counter], parameters);
+        } else if ((this.getIslandHeight() - 1) % 2 == 0) {
+            String [] moves = {"N", "E", "S", "S", "W", "W", "W"};
+            action = drone.fly(moves[this.counter], parameters);
+        } else if (this.getIslandHeight() % 4 == 0) {
+            String [] moves = {"E", "E", "N", "N", "W", "S", "W"};
+            action = drone.fly(moves[this.counter], parameters);
+        } else if (this.getIslandHeight() % 2 == 0) {
+            String [] moves = {"W", "W", "N", "N", "E", "S", "E"};
+            action = drone.fly(moves[this.counter], parameters)
+        }
+
+        this.counter++;
         return action;
     }
 
