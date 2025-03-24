@@ -23,6 +23,11 @@ public class SearchAlgorithm {
     private Drone drone;
     private boolean isWidthCentered;
     private boolean isHeightCentered;
+    private int islandTop;
+    private int islandBottom;
+    private int islandLeft;
+    private int islandRight;
+
 
     public SearchAlgorithm(Drone drone) {
         this.counter = 0;
@@ -32,14 +37,24 @@ public class SearchAlgorithm {
         this.isHeightCentered = false;
     }
 
+    /* SEARCH ALGORITHM HAS 7 PHASES
+     * FIND DIMENSIONS
+     * GO TO CENTRE
+     * GO TO TOP LEFT
+     * GET ISLAND DIMENSIONS
+     * FIRST SWEEP (interlaced sweep requires two iterations)
+     * IF LENGTH OF ISLAND IS EVEN, THEN: U TURN PHASE AND COMPLETE LAST ROW
+     * SECOND SWEEP
+     */
+
     public String findDimensions (Map<String, String> parameters) {
 
         String action;
-        if (counter == 0){
+        if (this.counter == 0){
             action = "echo";
             parameters.put("direction", "E");
         }
-        else if (counter == 1){
+        else if (this.counter == 1){
             action = "echo";
             parameters.put("direction", "S");
         }
@@ -48,7 +63,7 @@ public class SearchAlgorithm {
             counter = -1; // reset counter
         }
 
-        counter += 1;
+        this.counter += 1;
         return action;
     }
 
@@ -85,29 +100,219 @@ public class SearchAlgorithm {
         }
         else {
             action = "COMPLETED PHASE 2";
-            counter = -1; // reset counter
+            this.counter = -1; // reset counter
         }
-
-        counter += 1;
-        return action;
-    }
-
-    public String spiralSearch(Map<String, String> parameters) {
-        // fixed logic for now, but will be replaced with actual search algorithm
-        if (this.foundEmergencySite == true) {
-            return "COMPLETED PHASE 3";
-        }
-
-        
-        String action;
-        action = "scan";
 
         this.counter += 1;
-        logger.info("Counter: {}", this.counter);
+        return action;
+    }
+    /*
+    pseudo code for search
+    SIZE OF ISLAND
+
+    go all the way north until water is found
+    then continue north until scan throws out of bound on both left and right,
+    mark this as the top
+    turn left, and continue going all the way left until left echo is not returned keep this as the left 
+    turn left again, and go until you're past the middle, then start scanning and keep going in similar fashion
+    when no more scan is found, then you've reached the end. and we know max width and max height of island
+
+    FIRST SWEEP
+
+    at this point, you are at the bottom left corner
+    turn twice, and you'll be within the bounds of the map. for now, for every cell in there, scan the bottom
+    when you reach the end of a row, turn left or right (depending on current heading) 2x to make a u turn
+    |-> after this always move forward once before going again.
+    stop this loop when you've reached either the end if the length of the island is odd, or the second last if even
+    if even, do three turns to do the last row that wouldve been missed
+
+    SECOND SWEEP
+
+    then if even, immediately continue in the same fashion, propogating down instead
+    if odd, then do the three tunrs to do a u turn.
+
+
+    Additionally battery life should be watched, and as soon as the battery will die, the return home should be called
+    */
+
+    //takes in parameter output map, and previous echo response as arguments, returns the action as the output
+    // if out of bounds is found both left and right when the droen is facing north, then echoRes should == "none"
+    // similar for when drone facign east, except only left
+    public String goToTopLeft(Map<String, String> parameters) { return goToTopLeft(parameters, true); }
+    public String goToTopLeft(Map<String, String> parameters, boolean echoRes) {
+        String action;
+        if (drone.getCurrentOrientation() == Orientation.NORTH){
+            if (!echoRes){
+                this.islandTop = drone.getCurrentCoordinate().getY() + 1;
+                action = drone.fly("W", parameters);
+            } else {
+                action = drone.fly("N", parameters);
+            }
+        } else if (drone.getCurrentOrientation() == Orientation.WEST) {
+            if (!echoRes){
+                this.islandLeft = drone.getCurrentCoordinate().getX() + 1;
+                action = drone.fly("S", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        } else {
+            action = "COMPLETED PHASE 3";
+        }
 
         return action;
-
     }
+
+    //this function essentially goes from top left to bottom right to find dimensions of the island
+    //similar to (when facing west) above, echoRes should only be the result from the appropriate echo
+    public String getIslandDimension (Map<String, String> parameters) { return getIslandDimension(parameters, true); }
+    public String getIslandDimension (Map<String, String> parameters, boolean echoRes) {
+        String action;
+
+        if (drone.getCurrentOrientation() == Orientation.SOUTH) {
+            //this should be optimized later: tell command not to echo if we havent reached middle yet
+            if (!echoRes) {
+                this.islandBottom = drone.getCurrentCoordinate().getY() - 1;
+                action = drone.fly("E", parameters);
+            } else {
+                action = drone.fly("S", parameters);
+            }
+        } else if (drone.getCurrentOrientation() == Orientation.EAST) {
+            if (!echoRes) {
+                this.islandRight = drone.getCurrentCoordinate().getX() - 1;
+                action = drone.fly("N", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else {
+            action = "COMPLETED PHASE 4";
+        }
+        return action;
+    }
+
+    //this function conducts the sweep after the dimensions are found
+    public String firstSweep (Map<String, String> parameters) {
+        String action;
+        boolean stop = false;
+
+        Orientation direct = drone.getCurrentOrientation();
+        Location currLoc = drone.getCurrentCoordinate();
+
+        if (((this.islandBottom - this.islandTop) % 4 == 0) && (currLoc.getY() == this.islandTop - 1) && (currLoc.getX() == this.islandRight)) {
+            stop = true;
+        } else if (((this.islandBottom - this.islandTop) % 2 == 0) && (currLoc.getY() == this.islandTop - 1) && (currLoc.getX() == this.islandLeft)) {
+            stop = true;
+        } else if ((currLoc.getY() == this.islandTop)) {
+
+            if (((this.islandBottom - this.islandTop - 1) % 4 == 0) && (currLoc.getX() == this.islandLeft)) {
+                stop = true;
+            } else if (currLoc.getX() == this.islandRight) {
+                stop = true;
+            }
+            
+        }
+
+        if (stop){
+            this.counter = 0;
+            return "COMPLETED PHASE 5";
+        }
+
+        if (direct == Orientation.NORTH) {
+            if (currLoc.getX() == this.islandRight + 1) {
+                action = drone.fly("E", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        } else if (direct == Orientation.EAST) {
+            if (currLoc.getX() == this.islandRight) {
+                action = drone.fly("N", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else if (direct == Orientation.WEST) {
+            if (currLoc.getX() == this.islandLeft) {
+                action = drone.fly("N", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        } else {
+            if (currLoc.getX() < this.islandLeft) {
+                action = drone.fly("E", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        }
+        
+        return action;
+    }
+
+    public String uTurn(Map<String, String> parameters) {
+        String action;
+
+        Location currLoc = drone.getCurrentCoordinate();
+
+        if (this.counter == 7) {
+            counter = - 1;
+            action = "COMPLETED PHASE 6";
+        } else if ((this.getIslandHeight() - 1) % 4 == 0) {
+            String [] moves = {"N", "W", "S", "S", "E", "E", "E"};
+            action = drone.fly(moves[this.counter], parameters);
+        } else if ((this.getIslandHeight() - 1) % 2 == 0) {
+            String [] moves = {"N", "E", "S", "S", "W", "W", "W"};
+            action = drone.fly(moves[this.counter], parameters);
+        } else if (this.getIslandHeight() % 4 == 0) {
+            String [] moves = {"E", "E", "N", "N", "W", "S", "W"};
+            action = drone.fly(moves[this.counter], parameters);
+        } else {
+            String [] moves = {"W", "W", "N", "N", "E", "S", "E"};
+            action = drone.fly(moves[this.counter], parameters);
+        }
+
+        this.counter++;
+        return action;
+    }
+
+    public String secondSweep(Map<String, String> parameters){
+        String action;
+        boolean stop = false;
+
+        Orientation direct = drone.getCurrentOrientation();
+        Location currLoc = drone.getCurrentCoordinate();
+
+        if (currLoc.getY() == this.islandBottom + 1) {
+            if ((direct == Orientation.EAST) && (currLoc.getX() == this.islandLeft)){
+                stop = true;
+            } else if ((direct == Orientation.WEST) && (currLoc.getX() == this.islandRight)){
+                stop = true;
+            }
+        }
+
+        if (stop){
+            return "COMPLETED PHASE 7 AND COMPLETE SEARCH";
+        }
+
+        if (direct == Orientation.SOUTH) {
+            if (currLoc.getX() == this.islandRight + 1) {
+                action = drone.fly("W", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else if (direct == Orientation.EAST) {
+            if (currLoc.getX() == this.islandRight) {
+                action = drone.fly("S", parameters);
+            } else {
+                action = drone.fly("E", parameters);
+            }
+        } else {
+            if (currLoc.getX() == this.islandLeft) {
+                action = drone.fly("S", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        }
+        
+        return action;
+    }
+
 
     public int getCounter(){
         return this.counter;
@@ -131,6 +336,10 @@ public class SearchAlgorithm {
 
     public void setFoundEmergencySite(boolean foundEmergencySite){
         this.foundEmergencySite = foundEmergencySite;
+    }
+
+    public int getIslandHeight(){
+        return (this.islandBottom - this.islandTop);
     }
 
 }
