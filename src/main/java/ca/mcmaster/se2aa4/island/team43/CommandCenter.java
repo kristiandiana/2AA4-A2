@@ -55,6 +55,8 @@ public class CommandCenter {
                 phase = 2; // move to the next phase
             }
         }
+        //COMMAND CENTRE NEEDS TO BE ALTERED TO ACCOMODATE NEW PHASES
+        /*
         if (phase == 2) {
             action = this.searchAlgorithm.spiralSearch(parameters);
             if (action.equals("COMPLETED PHASE 3")) {
@@ -65,7 +67,7 @@ public class CommandCenter {
             action = "stop";
             parameters = null;
         }
-
+        */
         // SEND THE ACTION AND PARAMETERS TO THE Explorer
         return jsonHandler.createDecision(action, parameters);
     
