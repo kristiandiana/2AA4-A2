@@ -13,7 +13,7 @@ public class EnergyManager {
 
     public Phase checkBattery(){
         //Calculate current battery, and whats needed to return to base
-        if(currentBattery <= 30){
+        if(currentBattery <= distanceToBase){
             return Phase.STOP;
         }
         return Phase.CONTINUE;
