@@ -17,8 +17,8 @@ public class Drone {
     public Drone(int maxBattery, String startOrientation){
         //this.startCoordinate = startCoordinate;
         //this.currentCoordinate = startCoordinate;
-        this.startCoordinate = new NormalLocation(0, 0);
-        this.currentCoordinate = new NormalLocation(0, 0);
+        this.startCoordinate = new NormalLocation(1, 1);
+        this.currentCoordinate = new NormalLocation(1, 1);
         this.currentOrientation = stringToOrientation(startOrientation);
         this.energyManager = new EnergyManager(this, maxBattery);
     }

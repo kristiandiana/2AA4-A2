@@ -21,36 +21,20 @@ public class SearchAlgorithm {
     private int mapHeight;
     private boolean foundEmergencySite;
     private Drone drone;
+    private boolean isWidthCentered;
+    private boolean isHeightCentered;
 
     public SearchAlgorithm(Drone drone) {
         this.counter = 0;
         this.foundEmergencySite = false;
         this.drone = drone;
+        this.isWidthCentered = false;
+        this.isHeightCentered = false;
     }
 
     public String findDimensions (Map<String, String> parameters) {
 
         String action;
-
-        if (counter == 150){
-            action = "stop";
-        }
-
-        else if (counter % 2 == 0){
-            action = "scan";
-        }
-        else if (counter < 50){
-            action = drone.fly("E", parameters);
-        }
-        else if (counter >= 50 && counter < 100){
-            logger.info("I AM THE PROBLEM");
-            //action = "stop";
-            action = drone.fly("S", parameters);
-        }
-        else {
-            action = drone.fly("W", parameters);
-        }
-        /*
         if (counter == 0){
             action = "echo";
             parameters.put("direction", "E");
@@ -63,7 +47,7 @@ public class SearchAlgorithm {
             action = "COMPLETED PHASE 1";
             counter = -1; // reset counter
         }
-        */
+
         counter += 1;
         return action;
     }
@@ -73,14 +57,33 @@ public class SearchAlgorithm {
         int halfWidth = (mapWidth / 2) - 1;
         int halfHeight = mapHeight / 2;
 
-        if (counter < halfWidth) {
-            action = "fly";
-        } else if (counter == halfWidth) {
-            action = "heading";
-            parameters.put("direction", "S");
-        } else if (counter > halfWidth && counter <= halfWidth + halfHeight) {
-            action = "fly";
-        } else {
+        if (!isWidthCentered){
+            if (drone.getCurrentCoordinate().getX() < halfWidth) {
+                action = drone.fly("E", parameters);
+                if (drone.getCurrentCoordinate().getX() >= halfWidth) {
+                    isWidthCentered = true;
+                }
+            } else {
+                action = drone.fly("W", parameters);   
+                if (drone.getCurrentCoordinate().getX() <= halfWidth) {
+                    isWidthCentered = true;
+                } 
+            }
+        }
+        else if (!isHeightCentered){
+            if (drone.getCurrentCoordinate().getY() < halfHeight) {
+                action = drone.fly("S", parameters);
+                if (drone.getCurrentCoordinate().getY() >= halfHeight) {
+                    isHeightCentered = true;
+                }
+            } else {
+                action = drone.fly("N", parameters);
+                if (drone.getCurrentCoordinate().getY() <= halfHeight) {
+                    isHeightCentered = true;
+                }
+            }
+        }
+        else {
             action = "COMPLETED PHASE 2";
             counter = -1; // reset counter
         }
@@ -100,6 +103,7 @@ public class SearchAlgorithm {
         action = "scan";
 
         this.counter += 1;
+        logger.info("Counter: {}", this.counter);
 
         return action;
 

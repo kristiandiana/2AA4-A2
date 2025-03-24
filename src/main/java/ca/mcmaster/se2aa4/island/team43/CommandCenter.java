@@ -85,7 +85,6 @@ public class CommandCenter {
         logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
 
         if (phase == 0) { // getting width and height 
-            /*
             if (searchAlgorithm.getCounter() == 1){ // get the width from the extraInfo
                 int width = extraInfo.getInt("range");
                 // logger.info("The width of the island is {}", width);
@@ -96,8 +95,6 @@ public class CommandCenter {
                 // logger.info("The height of the island is {}", height);
                 searchAlgorithm.setMapHeight(height);
             }
-            */
-           logger.info("Got here");
         }
         else if (phase == 2) {
             JSONArray sites = extraInfo.getJSONArray("sites");
