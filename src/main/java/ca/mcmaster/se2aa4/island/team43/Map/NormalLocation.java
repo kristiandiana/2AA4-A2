@@ -1,4 +1,4 @@
-package ca.mcmaster.se2aa4.island.team43;
+package ca.mcmaster.se2aa4.island.team43.Map;
 
 public class NormalLocation extends Location {
     public NormalLocation(int xIn, int yIn) {

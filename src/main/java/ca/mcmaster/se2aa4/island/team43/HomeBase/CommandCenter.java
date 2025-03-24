@@ -1,4 +1,12 @@
-package ca.mcmaster.se2aa4.island.team43;
+package ca.mcmaster.se2aa4.island.team43.HomeBase;
+
+import ca.mcmaster.se2aa4.island.team43.HomeBase.*;
+import ca.mcmaster.se2aa4.island.team43.Drone.*;
+import ca.mcmaster.se2aa4.island.team43.Map.*;
+import ca.mcmaster.se2aa4.island.team43.Phases.*;
+
+
+
 
 import org.json.*;
 
@@ -11,8 +19,6 @@ import org.json.JSONArray;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import ca.mcmaster.se2aa4.island.team43.JSONHandler;
 
 public class CommandCenter {
     //Taking decisions at each step of drone flight
@@ -85,6 +91,8 @@ public class CommandCenter {
         logger.info("The cost of the action was {}", cost); // GIVE TO DRONE POWER MANAGEMENT
         logger.info("The status of the drone is {}", status); // GIVE TO MIA CHECK  
         logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
+
+
 
         if (phase == 0) { // getting width and height 
             searchAlgorithm.validateBounds(extraInfo);

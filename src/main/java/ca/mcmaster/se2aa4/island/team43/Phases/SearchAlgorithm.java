@@ -1,4 +1,9 @@
-package ca.mcmaster.se2aa4.island.team43;
+package ca.mcmaster.se2aa4.island.team43.Phases;
+
+import ca.mcmaster.se2aa4.island.team43.Drone.*;
+import ca.mcmaster.se2aa4.island.team43.Map.*;
+import ca.mcmaster.se2aa4.island.team43.HomeBase.*;
+
 
 import org.json.*;
 
@@ -10,8 +15,6 @@ import org.json.JSONTokener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import ca.mcmaster.se2aa4.island.team43.JSONHandler;
 
 public class SearchAlgorithm {
 
