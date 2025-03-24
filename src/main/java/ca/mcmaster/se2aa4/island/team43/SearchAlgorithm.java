@@ -27,8 +27,10 @@ public class SearchAlgorithm {
     private int westBound;
     private int northBound;
     private int southBound;
-    private boolean validVerticalBounds;
-    private boolean validHorizontalBounds;
+    private boolean validEastBound;
+    private boolean validWestBound;
+    private boolean validNorthBound;
+    private boolean validSouthBound;
     private String previousAction;
     private String previousActionDirection;
 
@@ -42,8 +44,10 @@ public class SearchAlgorithm {
         this.westBound = -1;
         this.northBound = -1;
         this.southBound = -1;
-        this.validVerticalBounds = false;
-        this.validHorizontalBounds = false;
+        this.validEastBound = false;
+        this.validWestBound = false;
+        this.validNorthBound = false;
+        this.validSouthBound = false;
     }
 
     public String findDimensions (Map<String, String> parameters) {
@@ -51,24 +55,43 @@ public class SearchAlgorithm {
         String action;
         String currentHeading = drone.getCurrentOrientation().toString();
 
+        logger.info("Current counter: {}", counter);
+        logger.info("Current bounds validity: E: {}, W: {}, N: {}, S: {}", validEastBound, validWestBound, validNorthBound, validSouthBound);
+
+        // *** PRELIMINARY SCAN FOR DEBUGGING TO SEE START LOCATION -> REMOVE LATER *** //
+        if (counter == 0){
+            previousAction = "scan";
+            previousActionDirection = "N";
+            counter += 1;
+            return "scan";
+        }
+
         if (currentHeading.equals("E") || currentHeading.equals("W")){
-            if (northBound < 0){
+            if (northBound < 0 || (!validNorthBound && previousAction.equals("fly"))){
                 action = "echo";
                 parameters.put("direction", "N");
                 previousAction = action;
                 previousActionDirection = "N";
             }
-            else if (southBound < 0){
+            else if (southBound < 0 || (!validSouthBound && previousAction.equals("fly"))){
                 action = "echo";
                 parameters.put("direction", "S");
                 previousAction = action;
                 previousActionDirection = "S";
             }
-            else if (validVerticalBounds == false){
-                action = "fly"; // move forwards if the bounds aren't valid
+            else if (!validSouthBound || !validNorthBound){ // move forwards if the bounds aren't valid
+                action = "fly";
                 previousAction = action;
+                if (currentHeading.equals("E")){
+                    eastBound -= 1;
+                    westBound += 1;
+                }
+                else {
+                    eastBound += 1;
+                    westBound -= 1;
+                }
             }
-            else if (validHorizontalBounds == false){
+            else if (!validEastBound || !validWestBound){
                 if (northBound < southBound){
                     action = drone.fly("S", parameters);
                     previousAction = action;
@@ -81,28 +104,38 @@ public class SearchAlgorithm {
                 }
             }
             else {
+                calculateDimensions();
+                drone.setCurrentCoordinate(westBound, northBound);
                 action = "COMPLETED PHASE 1";
                 counter = -1; // reset counter
             }
         }
         else {
-            if (eastBound < 0){
+            if (eastBound < 0 || (!validEastBound && previousAction.equals("fly"))){
                 action = "echo";
                 parameters.put("direction", "E");
                 previousAction = action;
                 previousActionDirection = "E";
             }
-            else if (westBound < 0){
+            else if (westBound < 0 || (!validWestBound && previousAction.equals("fly"))){
                 action = "echo";
                 parameters.put("direction", "W");
                 previousAction = action;
                 previousActionDirection = "W";
             }
-            else if (validHorizontalBounds == false){
-                action = "fly"; // move forwards if the bounds aren't valid
+            else if (!validEastBound || !validWestBound){ // move forwards if the bounds aren't valid
+                action = "fly";
                 previousAction = action;
+                if (currentHeading.equals("N")){
+                    northBound -= 1;
+                    southBound += 1;
+                }
+                else {
+                    northBound += 1;
+                    southBound -= 1;
+                }
             }
-            else if (validVerticalBounds == false){
+            else if (!validSouthBound || !validNorthBound){
                 if (eastBound < westBound){
                     action = drone.fly("W", parameters);
                     previousAction = action;
@@ -115,72 +148,64 @@ public class SearchAlgorithm {
                 }
             }
             else {
+                calculateDimensions();
+                drone.setCurrentCoordinate(westBound, northBound);
                 action = "COMPLETED PHASE 1";
                 counter = -1; // reset counter
             }
         }
-
-        /*
-        if (counter == 0){
-            action = "echo";
-            parameters.put("direction", "W");
-        }
-        else if (counter == 1){
-            action = "echo";
-            parameters.put("direction", "S");
-        }
-        else{
-            action = "COMPLETED PHASE 1";
-            counter = -1; // reset counter
-        }
-        */
 
         counter += 1;
         return action;
     }
 
     public void validateBounds(JSONObject extraInfo){
-        String found = extraInfo.getString("found");
-        int range = extraInfo.getInt("range");
+
+        logger.info("Collecting bounds information...");
+
+        String found;
+        int range;
 
         if (previousAction.equals("echo")){
+
+            found = extraInfo.getString("found");
+            range = extraInfo.getInt("range");
+
+            logger.info("Found: {}", found);
+            logger.info("Range: {}", range);
+
             if (previousActionDirection.equals("N")){
-                if (!found.equals("OUT_OF_RANGE")){
-                    validVerticalBounds = false;
-                }
-                else {
-                    validVerticalBounds = true;
+                if (found.equals("OUT_OF_RANGE")){
+                    validNorthBound = true;
                 }
                 northBound = range;
             }
             else if (previousActionDirection.equals("S")){
-                if (!found.equals("OUT_OF_RANGE")){
-                    validVerticalBounds = false;
-                }
-                else {
-                    validVerticalBounds = true;
+                if (found.equals("OUT_OF_RANGE")){
+                    validSouthBound = true;
                 }
                 southBound = range;
             }
             else if (previousActionDirection.equals("E")){
-                if (!found.equals("OUT_OF_RANGE")){
-                    validHorizontalBounds = false;
-                }
-                else {
-                    validHorizontalBounds = true;
+                if (found.equals("OUT_OF_RANGE")){
+                    validEastBound = true;
                 }
                 eastBound = range;
             }
             else if (previousActionDirection.equals("W")){
-                if (!found.equals("OUT_OF_RANGE")){
-                    validHorizontalBounds = false;
-                }
-                else {
-                    validHorizontalBounds = true;
+                if (found.equals("OUT_OF_RANGE")){
+                    validWestBound = true;
                 }
                 westBound = range;
             }
         }
+
+        logger.info("Finished collecting bounds information...");
+    }
+
+    public void calculateDimensions(){
+        mapWidth = eastBound + westBound + 1;
+        mapHeight = northBound + southBound + 1;
     }
 
     public String goToCenter (Map<String, String> parameters) {
@@ -188,13 +213,23 @@ public class SearchAlgorithm {
         int halfWidth = (mapWidth / 2) - 1;
         int halfHeight = mapHeight / 2;
 
+        if (counter == 0){
+            counter += 1;
+            return "scan";
+        }
+
+        logger.info("Drone current location: ({}, {})", drone.getCurrentCoordinate().getX(), drone.getCurrentCoordinate().getY());
+
+        logger.info("Map dimensions: ({}, {})", mapWidth, mapHeight);
         if (!isWidthCentered){
             if (drone.getCurrentCoordinate().getX() < halfWidth) {
+                logger.info("Moving east...");
                 action = drone.fly("E", parameters);
                 if (drone.getCurrentCoordinate().getX() >= halfWidth) {
                     isWidthCentered = true;
                 }
             } else {
+                logger.info("Moving west...");
                 action = drone.fly("W", parameters);   
                 if (drone.getCurrentCoordinate().getX() <= halfWidth) {
                     isWidthCentered = true;
@@ -215,6 +250,7 @@ public class SearchAlgorithm {
             }
         }
         else {
+
             action = "COMPLETED PHASE 2";
             counter = -1; // reset counter
         }
@@ -264,12 +300,5 @@ public class SearchAlgorithm {
         this.foundEmergencySite = foundEmergencySite;
     }
 
-    public void setValidVerticalBounds(boolean validVerticalBounds){
-        this.validVerticalBounds = validVerticalBounds;
-    }
-
-    public void setValidHorizontalBounds(boolean validHorizontalBounds){
-        this.validHorizontalBounds = validHorizontalBounds;
-    }
 
 }

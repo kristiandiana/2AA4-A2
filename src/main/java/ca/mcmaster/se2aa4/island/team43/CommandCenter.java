@@ -43,7 +43,7 @@ public class CommandCenter {
             action = this.searchAlgorithm.findDimensions(parameters);
             if (action.equals("COMPLETED PHASE 1")) {
                 phase = 1; // move to the next phase
-
+                logger.info("Completed phase 1");
                 // *** IMPORTANT ***
                 // MIGHT BE GOOD TO INITIALIZE THE ISLAND HERE AS MAX WIDTH AND HEIGHT ARE NOW KNOWN IN THE SEARCH ALGORITHM OBJECT
 
