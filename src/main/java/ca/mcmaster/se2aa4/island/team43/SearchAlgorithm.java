@@ -23,6 +23,12 @@ public class SearchAlgorithm {
     private Drone drone;
     private boolean isWidthCentered;
     private boolean isHeightCentered;
+    private int islandTop;
+    private int islandBottom;
+    private int islandLeft;
+    private int islandRight;
+    private boolean onSecondSweep;
+
 
     public SearchAlgorithm(Drone drone) {
         this.counter = 0;
@@ -30,7 +36,17 @@ public class SearchAlgorithm {
         this.drone = drone;
         this.isWidthCentered = false;
         this.isHeightCentered = false;
+        this.onSecondSweep = false;
     }
+
+    /* SEARCH ALGORITHM HAS 5 PHASES
+     * FIND DIMENSIONS
+     * GO TO CENTRE
+     * GO TO TOP LEFT
+     * GET ISLAND DIMENSIONS
+     * FIRST SWEEP (interlaced sweep requires two iterations)
+     * SECOND SWEEP
+     */
 
     public String findDimensions (Map<String, String> parameters) {
 
@@ -109,7 +125,8 @@ public class SearchAlgorithm {
         return action;
         */
 
-        /*pseudo code for search
+        /*
+        pseudo code for search
         PHASE 3.1: SIZE OF ISLAND
 
         go all the way north until water is found
@@ -135,9 +152,47 @@ public class SearchAlgorithm {
 
 
         Additionally battery life should be watched, and as soon as the battery will die, the return home should be called
-
         */
+
     }
+
+    //takes in parameter output map, and previous echo response as arguments, returns the action as the output
+    // if out of bounds is found both left and right when the droen is facing north, then echoRes should == "none"
+    // similar for when drone facign east, except only left
+    public String goToTopLeft(Map<String, String> parameters, String echoRes) {
+        String action;
+        if (drone.getCurrentOrientation() == Orientation.NORTH){
+            if (echoRes == "none"){
+                this.islandTop = drone.getCurrentCoordinate().getY();
+                action = drone.fly("W", parameters);
+            } else {
+                action = drone.fly("N", parameters);
+            }
+        } else if (drone.getCurrentOrientation() == Orientation.WEST) {
+            if (echoRes == "none"){
+                action = drone.fly("S", parameters);
+            } else {
+                action = drone.fly("W", parameters);
+            }
+        } else {
+            action = "COMPLETED PHASE 3";
+        }
+
+        return action;
+    }
+
+    //this function essentially goes from top left to bottom right to find dimensions of the island
+    public String getIslandDimension (Map<String, String> parameters, String echoRes) {
+        String action;
+        return action;
+    }
+
+    //this function conducts the sweep after the dimensions are found
+    public String sweepSearch (Map<String, String> parameters) {
+        String action;
+        return action;
+    }
+
 
     public int getCounter(){
         return this.counter;
