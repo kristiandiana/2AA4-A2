@@ -76,13 +76,49 @@ public class CommandCenter {
                 action = this.searchAlgorithm.goToTopLeft(parameters, echoParam);
             }
             if (action.equals("COMPLETED PHASE 3")) {
+                echoRes.clear();
                 phase = 3; // move to the next phase
             }
         }
 
         if (phase == 3){
+            if (echoRes == null){
+                action = this.searchAlgorithm.getIslandDimension(parameters);
+            } else if (echoRes.get(0).equals("OUT_OF_BOUNDS")){
+            action = this.searchAlgorithm.goToTopLeft(parameters, false);
+            } else {
+                action = this.searchAlgorithm.goToTopLeft(parameters, true);
+            }
+
+            if (action.equals("COMPLETED PHASE 4")) {
+                echoRes.clear();
+                phase = 4; // move to the next phase
+            }
+        }
+
+        if (phase == 4) {
+            action = this.searchAlgorithm.firstSweep(parameters);
+            if (action.equals("COMPLETED PHASE 5")) {
+                phase = 5;
+            }
+        }
+
+        if (phase == 5) {
+            action = this.searchAlgorithm.uTurn(parameters);
+            if (action.equals("COMPLETED PHASE 6")) {
+                phase = 6;
+            }
+        }
+
+        if (phase == 6) {
+            action = this.searchAlgorithm.secondSweep(parameters);
+            if (action.equals("COMPLETED PHASE 7")) {
+                phase = 7;
+            }
+        }
+
+        if (phase == 7) {
             action = "stop";
-            parameters = null;
         }
         // SEND THE ACTION AND PARAMETERS TO THE Explorer
         return jsonHandler.createDecision(action, parameters);
@@ -111,6 +147,13 @@ public class CommandCenter {
             if (extraInfo.has("found")) {
                 this.echoRes.add(extraInfo.getString("found"));
                 if (this.echoRes.size() > 3) {
+                    this.echoRes.remove(0);
+                }
+            }
+        } else if (phase == 3) {
+            if (extraInfo.has("found")) {
+                this.echoRes.add(extraInfo.getString("found"));
+                if (this.echoRes.size() > 1) {
                     this.echoRes.remove(0);
                 }
             }

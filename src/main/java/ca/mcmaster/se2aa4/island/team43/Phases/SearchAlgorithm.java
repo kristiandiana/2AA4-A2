@@ -301,7 +301,7 @@ public class SearchAlgorithm {
             }
         } else if (drone.getCurrentOrientation() == Orientation.WEST) {
             if (this.counter == 0) {
-                action = drone.echo("S", parameters)
+                action = drone.echo("S", parameters);
             }
             if (!echoRes){
                 this.islandLeft = drone.getCurrentCoordinate().getX() + 1;
@@ -328,13 +328,18 @@ public class SearchAlgorithm {
 
         if (drone.getCurrentOrientation() == Orientation.SOUTH) {
             //this should be optimized later: tell command not to echo if we havent reached middle yet
-            if (!echoRes) {
+            if (this.counter % 2 == 0){
+                action = drone.echo("W", parameters);
+            } else if (!echoRes) {
                 this.islandBottom = drone.getCurrentCoordinate().getY() - 1;
                 action = drone.fly("E", parameters);
             } else {
                 action = drone.fly("S", parameters);
             }
         } else if (drone.getCurrentOrientation() == Orientation.EAST) {
+            if (this.counter % 2 == 0) {
+                action = drone.echo("N", parameters);
+            }
             if (!echoRes) {
                 this.islandRight = drone.getCurrentCoordinate().getX() - 1;
                 action = drone.fly("N", parameters);
@@ -343,7 +348,9 @@ public class SearchAlgorithm {
             }
         } else {
             action = "COMPLETED PHASE 4";
+            this.counter = -1;
         }
+        this.counter++;
         return action;
     }
 
@@ -443,7 +450,7 @@ public class SearchAlgorithm {
         }
 
         if (stop){
-            return "COMPLETED PHASE 7 AND COMPLETE SEARCH";
+            return "COMPLETED PHASE 7";
         }
 
         if (direct == Orientation.SOUTH) {
