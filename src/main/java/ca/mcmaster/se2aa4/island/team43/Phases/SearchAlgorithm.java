@@ -388,13 +388,17 @@ public class SearchAlgorithm {
                 action = drone.fly("W", parameters);
             }
         } else if (direct == Orientation.EAST) {
-            if (currLoc.getX() == this.islandRight) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandRight) {
                 action = drone.fly("N", parameters);
             } else {
                 action = drone.fly("E", parameters);
             }
         } else if (direct == Orientation.WEST) {
-            if (currLoc.getX() == this.islandLeft) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandLeft) {
                 action = drone.fly("N", parameters);
             } else {
                 action = drone.fly("W", parameters);
@@ -407,6 +411,7 @@ public class SearchAlgorithm {
             }
         }
         
+        this.counter++;
         return action;
     }
 
@@ -429,6 +434,8 @@ public class SearchAlgorithm {
             String [] moves = {"W", "W", "N", "N", "E", "S", "E"};
             action = drone.fly(moves[this.counter], parameters);
         }
+
+        if (this.counter == 6){ this.counter = -1; }
 
         this.counter++;
         return action;
@@ -460,13 +467,17 @@ public class SearchAlgorithm {
                 action = drone.fly("E", parameters);
             }
         } else if (direct == Orientation.EAST) {
-            if (currLoc.getX() == this.islandRight) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandRight) {
                 action = drone.fly("S", parameters);
             } else {
                 action = drone.fly("E", parameters);
             }
         } else {
-            if (currLoc.getX() == this.islandLeft) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandLeft) {
                 action = drone.fly("S", parameters);
             } else {
                 action = drone.fly("W", parameters);

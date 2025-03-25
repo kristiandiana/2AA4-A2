@@ -157,6 +157,8 @@ public class CommandCenter {
                     this.echoRes.remove(0);
                 }
             }
+        } else if ( (phase == 4) || (phase == 7)) {
+            ;
         }
     }
 
