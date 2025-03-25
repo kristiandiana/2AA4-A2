@@ -186,6 +186,17 @@ public class Drone {
         }
     }
 
+    public String echo(String direction, Map<String, String> parameters) {
+        String action = "echo";
+        parameters.put("direction", direction);
+        return action;
+    }
+
+    public String scan() {
+        String action = "scan";
+        return action;
+    }
+
     public void depleteBattery(int cost){
         energyManager.depleteBattery(cost);
     }

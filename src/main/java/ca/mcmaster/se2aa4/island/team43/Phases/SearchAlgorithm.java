@@ -279,59 +279,44 @@ public class SearchAlgorithm {
         this.counter += 1;
         return action;
     }
-    /*
-    pseudo code for search
-    SIZE OF ISLAND
-
-    go all the way north until water is found
-    then continue north until scan throws out of bound on both left and right,
-    mark this as the top
-    turn left, and continue going all the way left until left echo is not returned keep this as the left 
-    turn left again, and go until you're past the middle, then start scanning and keep going in similar fashion
-    when no more scan is found, then you've reached the end. and we know max width and max height of island
-
-    FIRST SWEEP
-
-    at this point, you are at the bottom left corner
-    turn twice, and you'll be within the bounds of the map. for now, for every cell in there, scan the bottom
-    when you reach the end of a row, turn left or right (depending on current heading) 2x to make a u turn
-    |-> after this always move forward once before going again.
-    stop this loop when you've reached either the end if the length of the island is odd, or the second last if even
-    if even, do three turns to do the last row that wouldve been missed
-
-    SECOND SWEEP
-
-    then if even, immediately continue in the same fashion, propogating down instead
-    if odd, then do the three tunrs to do a u turn.
-
-
-    Additionally battery life should be watched, and as soon as the battery will die, the return home should be called
-    */
-
-    //takes in parameter output map, and previous echo response as arguments, returns the action as the output
-    // if out of bounds is found both left and right when the droen is facing north, then echoRes should == "none"
-    // similar for when drone facign east, except only left
+    
     public String goToTopLeft(Map<String, String> parameters) { return goToTopLeft(parameters, true); }
     public String goToTopLeft(Map<String, String> parameters, boolean echoRes) {
         String action;
+
+
         if (drone.getCurrentOrientation() == Orientation.NORTH){
-            if (!echoRes){
+
+            if (this.counter == 0) {
+                action = drone.echo("E", parameters);
+            } else if (this.counter == 1) {
+                action = drone.echo("W", parameters);
+            } else if(!echoRes){
                 this.islandTop = drone.getCurrentCoordinate().getY() + 1;
                 action = drone.fly("W", parameters);
+                this.counter = -1;
             } else {
                 action = drone.fly("N", parameters);
+                this.counter = -1;
             }
         } else if (drone.getCurrentOrientation() == Orientation.WEST) {
+            if (this.counter == 0) {
+                action = drone.echo("S", parameters);
+            }
             if (!echoRes){
                 this.islandLeft = drone.getCurrentCoordinate().getX() + 1;
                 action = drone.fly("S", parameters);
+                this.counter = -1;
             } else {
                 action = drone.fly("W", parameters);
+                this.counter = -1;
             }
         } else {
+            this.counter = -1;
             action = "COMPLETED PHASE 3";
         }
 
+        this.counter++;
         return action;
     }
 
@@ -343,13 +328,18 @@ public class SearchAlgorithm {
 
         if (drone.getCurrentOrientation() == Orientation.SOUTH) {
             //this should be optimized later: tell command not to echo if we havent reached middle yet
-            if (!echoRes) {
+            if (this.counter % 2 == 0){
+                action = drone.echo("W", parameters);
+            } else if (!echoRes) {
                 this.islandBottom = drone.getCurrentCoordinate().getY() - 1;
                 action = drone.fly("E", parameters);
             } else {
                 action = drone.fly("S", parameters);
             }
         } else if (drone.getCurrentOrientation() == Orientation.EAST) {
+            if (this.counter % 2 == 0) {
+                action = drone.echo("N", parameters);
+            }
             if (!echoRes) {
                 this.islandRight = drone.getCurrentCoordinate().getX() - 1;
                 action = drone.fly("N", parameters);
@@ -358,7 +348,9 @@ public class SearchAlgorithm {
             }
         } else {
             action = "COMPLETED PHASE 4";
+            this.counter = -1;
         }
+        this.counter++;
         return action;
     }
 
@@ -396,13 +388,17 @@ public class SearchAlgorithm {
                 action = drone.fly("W", parameters);
             }
         } else if (direct == Orientation.EAST) {
-            if (currLoc.getX() == this.islandRight) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandRight) {
                 action = drone.fly("N", parameters);
             } else {
                 action = drone.fly("E", parameters);
             }
         } else if (direct == Orientation.WEST) {
-            if (currLoc.getX() == this.islandLeft) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandLeft) {
                 action = drone.fly("N", parameters);
             } else {
                 action = drone.fly("W", parameters);
@@ -415,13 +411,12 @@ public class SearchAlgorithm {
             }
         }
         
+        this.counter++;
         return action;
     }
 
     public String uTurn(Map<String, String> parameters) {
         String action;
-
-        Location currLoc = drone.getCurrentCoordinate();
 
         if (this.counter == 7) {
             counter = - 1;
@@ -439,6 +434,8 @@ public class SearchAlgorithm {
             String [] moves = {"W", "W", "N", "N", "E", "S", "E"};
             action = drone.fly(moves[this.counter], parameters);
         }
+
+        if (this.counter == 6){ this.counter = -1; }
 
         this.counter++;
         return action;
@@ -460,7 +457,7 @@ public class SearchAlgorithm {
         }
 
         if (stop){
-            return "COMPLETED PHASE 7 AND COMPLETE SEARCH";
+            return "COMPLETED PHASE 7";
         }
 
         if (direct == Orientation.SOUTH) {
@@ -470,13 +467,17 @@ public class SearchAlgorithm {
                 action = drone.fly("E", parameters);
             }
         } else if (direct == Orientation.EAST) {
-            if (currLoc.getX() == this.islandRight) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandRight) {
                 action = drone.fly("S", parameters);
             } else {
                 action = drone.fly("E", parameters);
             }
         } else {
-            if (currLoc.getX() == this.islandLeft) {
+            if ((this.counter % 2) == 0){
+                action = drone.scan();
+            } else if (currLoc.getX() == this.islandLeft) {
                 action = drone.fly("S", parameters);
             } else {
                 action = drone.fly("W", parameters);
