@@ -4,4 +4,5 @@ public interface POI {
     //Points of interest
 
     public int getDistance(Location other);
+    public String getId();
 }
