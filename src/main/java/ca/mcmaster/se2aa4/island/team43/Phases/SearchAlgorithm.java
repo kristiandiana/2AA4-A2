@@ -70,7 +70,7 @@ public class SearchAlgorithm {
      * SECOND SWEEP
      */
 
-    public String findDimensions (Map<String, String> parameters) {
+    public String findDimensions (Map<String, String> parameters, Island island) {
 
         String action;
         String currentHeading = drone.getCurrentOrientation().toString();
@@ -124,7 +124,7 @@ public class SearchAlgorithm {
                 }
             }
             else {
-                calculateDimensions();
+                calculateDimensions(island);
                 drone.setCurrentCoordinate(westBound, northBound);
                 action = "COMPLETED PHASE 1";
                 counter = -1; // reset counter
@@ -169,7 +169,7 @@ public class SearchAlgorithm {
                 }
             }
             else {
-                calculateDimensions();
+                calculateDimensions(island);
                 drone.setCurrentCoordinate(westBound, northBound);
                 action = "COMPLETED PHASE 1";
                 counter = -1; // reset counter
@@ -224,9 +224,10 @@ public class SearchAlgorithm {
         logger.info("Finished collecting bounds information...");
     }
 
-    public void calculateDimensions(){
+    public void calculateDimensions(Island island){
         mapWidth = eastBound + westBound + 1;
         mapHeight = northBound + southBound + 1;
+        island = new Island(mapWidth, mapHeight);
     }
 
     public String goToCenter (Map<String, String> parameters) {

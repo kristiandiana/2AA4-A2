@@ -6,44 +6,45 @@ public class Island {
     //Store information about the mapping of the island
     //Creeks, Emergency site location, size of map
     Location[][] grid;
-    Location start;
     ArrayList<Creek> creeks;
     EmergencySite emergencySite;
 
-    public Island (int MaxX, int MaxY, Location startingLocation) {
+    public Island (int MaxX, int MaxY) {
         this.grid = new Location[MaxX][MaxY];
-        this.start = startingLocation;
-        this.grid[startingLocation.getX()][startingLocation.getY()] = startingLocation;
         this.creeks = new ArrayList<Creek>();
         this.emergencySite = null;
     }
 
-    public void addLocation(String type, int x, int y) {
+    public void addLocation(int x, int y) {
+        addLocation("N/A", x, y, "N/A");
+    }
+    
+    public void addLocation(String type, int x, int y, String id) {
         if (type.equals("creek")) {
-            addCreek(x, y);
+            addCreek(x, y, id);
         } else if (type.equals("emergency")) {
-            addEmergencySite(x, y);
+            addEmergencySite(x, y, id);
         } else {
-            addLocation(x, y);
+            addNormalLocation(x, y);
         }
     }
 
-    private void addLocation(int x, int y) {
+    private void addNormalLocation(int x, int y) {
         Location newLocation = new Location(x, y);
         this.grid[x][y] = newLocation;
     }
 
-    private void addCreek(int x, int y) {
-        Creek newCreek = new Creek(x, y);
+    private void addCreek(int x, int y, String id) {
+        Creek newCreek = new Creek(x, y, id);
         this.creeks.add(newCreek);
         this.grid[x][y] = newCreek;
     }
 
-    private void addEmergencySite(int x, int y) {
+    private void addEmergencySite(int x, int y, String id) {
         if (this.emergencySite != null) {
             throw new Error("Cannot have more than one Pick Up Location!");
         }
-        EmergencySite newEmergencySite = new EmergencySite(x, y);
+        EmergencySite newEmergencySite = new EmergencySite(x, y, id);
         this.emergencySite = newEmergencySite;
         this.grid[x][y] = newEmergencySite;
     }

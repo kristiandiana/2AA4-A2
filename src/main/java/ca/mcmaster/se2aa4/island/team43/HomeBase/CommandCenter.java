@@ -29,12 +29,14 @@ public class CommandCenter {
     SearchAlgorithm searchAlgorithm;
     private int phase;
     private ArrayList<String> echoRes;
+    Island island;
 
     public CommandCenter(int startBattery, String startOrientation) {
 
         this.drone = new Drone(startBattery, startOrientation);
         this.searchAlgorithm = new SearchAlgorithm(this.drone);
         this.phase = 0;
+        this.echoRes = new ArrayList<String>();
 
         // SHOULD ENERGY MANAGER BE INSTANTIATED HERE?
         // EnergyManager energyManager = new EnergyManager(drone, 1000);
@@ -48,7 +50,7 @@ public class CommandCenter {
 
         // EXAMPLE DATA FOR NOW BUT PUT THE LOGIC / ALGORITHM HERE
         if (phase == 0) {
-            action = this.searchAlgorithm.findDimensions(parameters);
+            action = this.searchAlgorithm.findDimensions(parameters, island);
             if (action.equals("COMPLETED PHASE 1")) {
                 phase = 1; // move to the next phase
                 logger.info("Completed phase 1");
@@ -71,7 +73,7 @@ public class CommandCenter {
                 boolean echoParam = false;
                 for (int i = 0; i < echoRes.size(); i++){
                     /* HERE DONT FORGET TO EDIT HERE PLEASE */
-                    if (!echoRes.get(i).equals("OUT_OF_BOUNDS")){ echoParam = true;}
+                    if (!echoRes.get(i).equals("OUT_OF_RANGE")){ echoParam = true;}
                 }
                 action = this.searchAlgorithm.goToTopLeft(parameters, echoParam);
             }
@@ -82,9 +84,9 @@ public class CommandCenter {
         }
 
         if (phase == 3){
-            if (echoRes == null){
+            if (echoRes.size() == 0){
                 action = this.searchAlgorithm.getIslandDimension(parameters);
-            } else if (echoRes.get(0).equals("OUT_OF_BOUNDS")){
+            } else if (echoRes.get(0).equals("OUT_OF_RANGE")){
             action = this.searchAlgorithm.goToTopLeft(parameters, false);
             } else {
                 action = this.searchAlgorithm.goToTopLeft(parameters, true);
@@ -158,7 +160,20 @@ public class CommandCenter {
                 }
             }
         } else if ( (phase == 4) || (phase == 7)) {
-            ;
+            if (extraInfo.has("creeks")){
+                JSONArray creeks = extraInfo.getJSONArray("creeks");
+                JSONArray sites = extraInfo.getJSONArray("sites");
+                Location currLoc = drone.getCurrentCoordinate();
+
+                if ((creeks.length() != 0)) {
+                    island.addLocation("creek",currLoc.getX(), currLoc.getY(), creeks.getString(0));
+                } else if (sites.length() != 0) {
+                    island.addLocation("emergency", currLoc.getX(), currLoc.getY(), sites.getString(0));
+                } else {
+                    island.addLocation(currLoc.getX(), currLoc.getY());
+                }
+                
+            }
         }
     }
 
