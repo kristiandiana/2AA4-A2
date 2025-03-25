@@ -285,7 +285,6 @@ public class SearchAlgorithm {
     public String goToTopLeft(Map<String, String> parameters, boolean echoRes) {
         String action;
 
-
         if (drone.getCurrentOrientation() == Orientation.NORTH){
 
             if (this.counter == 0) {
