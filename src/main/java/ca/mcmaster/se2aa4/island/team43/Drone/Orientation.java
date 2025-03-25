@@ -20,6 +20,11 @@ public enum Orientation {
         public String toString() {
             return "N";
         }
+
+        @Override
+        public boolean opposite(Orientation orientation) {
+            return orientation == SOUTH;
+        }
     },
     SOUTH {
         @Override
@@ -35,6 +40,11 @@ public enum Orientation {
         @Override
         public String toString() {
             return "S";
+        }
+
+        @Override
+        public boolean opposite(Orientation orientation) {
+            return orientation == NORTH;
         }
     },
     EAST {
@@ -52,6 +62,11 @@ public enum Orientation {
         public String toString() {
             return "E";
         }
+
+        @Override
+        public boolean opposite(Orientation orientation) {
+            return orientation == WEST;
+        }
     },
     WEST {
         @Override
@@ -67,6 +82,11 @@ public enum Orientation {
         @Override
         public String toString() {
             return "W";
+        }
+
+        @Override
+        public boolean opposite(Orientation orientation) {
+            return orientation == EAST;
         }
     };
 
@@ -90,4 +110,9 @@ public enum Orientation {
      * @return The orientation as a string.
      */
     public abstract String toString();
+
+    /*
+     * Returns if the current is opposite to a given orientation.
+     */
+    public abstract boolean opposite(Orientation orientation);
 }

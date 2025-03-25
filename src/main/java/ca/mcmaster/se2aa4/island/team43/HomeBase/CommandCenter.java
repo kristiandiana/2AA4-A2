@@ -138,7 +138,8 @@ public class CommandCenter {
         logger.info("The status of the drone is {}", status); // GIVE TO MIA CHECK  
         logger.info("Additional information received: {}", extraInfo); // GIVE TO MAP LOGGER
 
-
+        drone.depleteBattery(cost);
+        logger.info("Current battery level: {}", drone.getCurrentBattery());
 
         if (phase == 0) { // getting width and height 
             searchAlgorithm.validateBounds(extraInfo);

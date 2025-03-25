@@ -4,7 +4,7 @@ import ca.mcmaster.se2aa4.island.team43.Phases.Phase;
 
 public class EnergyManager {
     private int currentBattery;
-    private final int distanceToBase = 30;
+    private final int costToBase = 50;
 
     //Managing battery levels
     public EnergyManager(int maxBattery){
@@ -13,7 +13,7 @@ public class EnergyManager {
 
     public Phase checkBattery(){
         //Calculate current battery, and whats needed to return to base
-        if(currentBattery <= distanceToBase){
+        if(currentBattery <= costToBase){
             return Phase.STOP;
         }
         return Phase.CONTINUE;

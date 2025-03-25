@@ -1,6 +1,7 @@
 package ca.mcmaster.se2aa4.island.team43.Map;
 
 import ca.mcmaster.se2aa4.island.team43.Drone.Orientation;
+import ca.mcmaster.se2aa4.island.team43.HomeBase.Actions;
 
 public class Location {
     //Location of drone on map
@@ -52,10 +53,10 @@ public class Location {
      * @param currentOrientation the current orientation of the drone
      */
     public void moveY(Orientation currentOrientation){
-        if(currentOrientation == Orientation.NORTH){
+        if(currentOrientation == Orientation.SOUTH){
             increaseY();
         }
-        else if(currentOrientation == Orientation.SOUTH){
+        else if(currentOrientation == Orientation.NORTH){
             decreaseY();
         }
     }
@@ -77,7 +78,7 @@ public class Location {
      * @param currentOrientation the current orientation of the drone
      * @param newOrientation the new orientation of the drone
      */
-    public void move(Orientation currentOrientation, Orientation newOrientation){
+    public Actions move(Orientation currentOrientation, Orientation newOrientation){
         
         if(currentOrientation == newOrientation){
             
@@ -86,9 +87,12 @@ public class Location {
             } else {
                 moveX(currentOrientation);
             }
+
+            return Actions.FLY;
         } else {
             moveX(currentOrientation);
             moveY(newOrientation);
+            return Actions.HEADING;
         }
     }
 
