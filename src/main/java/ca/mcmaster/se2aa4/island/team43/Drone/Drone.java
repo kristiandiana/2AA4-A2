@@ -15,6 +15,7 @@ public class Drone {
     private Location currentCoordinate;
     private Orientation currentOrientation;
     private final EnergyManager energyManager;
+    private final BoundsManager boundsManager;
     private final Location startCoordinate;
 
     private final Logger logger = LogManager.getLogger();
@@ -26,6 +27,8 @@ public class Drone {
         this.currentCoordinate = new NormalLocation(1, 1);
         this.currentOrientation = stringToOrientation(startOrientation);
         this.energyManager = new EnergyManager(maxBattery);
+        this.boundsManager = new BoundsManager();
+
     }
 
     public Orientation stringToOrientation(String orientation){
@@ -166,6 +169,13 @@ public class Drone {
                 }
                 break;
         }
+
+        // validate fly operation with boundsManager
+        if (action.equals("fly")){
+            Actions validateAction = boundsManager.validateFly(getCurrentCoordinate(), parameters);
+            action = validateAction.toString();
+        }
+
         return action;
     }
 
@@ -203,6 +213,12 @@ public class Drone {
 
     public Phase checkBattery(){
         return energyManager.checkBattery();
+    }
+
+    public void setBounds(int eastBound, int southBound){
+        boundsManager.setEastBound(eastBound);
+        boundsManager.setSouthBound(southBound);
+        boundsManager.setBoundsSet(true);
     }
 
 }
