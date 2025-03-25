@@ -1,8 +1,5 @@
 package ca.mcmaster.se2aa4.island.team43.Map;
 
-import ca.mcmaster.se2aa4.island.team43.Map.Location;
-
-
 
 public class Creek extends Location implements POI  {
     //A POI of pickup spots for rescuers
@@ -15,7 +12,7 @@ public class Creek extends Location implements POI  {
         return "creek";
     }
 
-    public float getDistance(Location node) {
-        return (float) Math.sqrt(Math.pow(this.x - node.x, 2) + Math.pow(this.y - node.y, 2));
+    public int getDistance(Location node) {
+        return (int) Math.abs(this.getX() - node.getX()) + Math.abs(this.getY() - node.getY());
     }
 }

@@ -1,18 +1,16 @@
 package ca.mcmaster.se2aa4.island.team43.Map;
 
-import ca.mcmaster.se2aa4.island.team43.Map.*;
-
 import java.util.ArrayList;
 
 public class Island {
     //Store information about the mapping of the island
     //Creeks, Emergency site location, size of map
     Location[][] grid;
-    StartingLocation start;
+    Location start;
     ArrayList<Creek> creeks;
     EmergencySite emergencySite;
 
-    public Island (int MaxX, int MaxY, StartingLocation startingLocation) {
+    public Island (int MaxX, int MaxY, Location startingLocation) {
         this.grid = new Location[MaxX][MaxY];
         this.start = startingLocation;
         this.grid[startingLocation.getX()][startingLocation.getY()] = startingLocation;
@@ -31,7 +29,7 @@ public class Island {
     }
 
     private void addLocation(int x, int y) {
-        NormalLocation newLocation = new NormalLocation(x, y);
+        Location newLocation = new Location(x, y);
         this.grid[x][y] = newLocation;
     }
 
